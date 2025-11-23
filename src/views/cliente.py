@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from abstract import SQLResult, SQLResultDict
 from models.cliente import Cliente
-from repositories.db import aexec_query
+from repositories.sql_db import aexec_query
 
 
 router = APIRouter(prefix='/cliente', tags=['cliente'])

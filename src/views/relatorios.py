@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from abstract import SQLResult, SQLResultDict
-from repositories.db import aexec_query
+from repositories.sql_db import aexec_query
 
 
 router = APIRouter(prefix='/relatorios', tags=['relatorios'])
