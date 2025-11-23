@@ -1,8 +1,12 @@
-
 from fastapi import APIRouter
 
 from abstract import SQLResult
+from repositories.mongo import Mongo
 from repositories.sql_db import exec_script
+from app_layer.init_mongo import (
+    rm_existent_collections,
+    create_collections,
+)
 
 
 router = APIRouter(prefix='/-', tags=['management'])
@@ -13,9 +17,12 @@ async def health_check():
     return {'status': 'healthy'}
 
 
-@router.post('/reset_db', response_model=SQLResult)
+# FIXME: response_model
+@router.post('/reset_db')
 async def reset_db():
-    return exec_script('management/reset_db.sql')
+    app_adb = Mongo().app_adb
+    await rm_existent_collections(app_adb)
+    await create_collections(app_adb)
 
 
 @router.post('/seed_products', response_model=SQLResult)
