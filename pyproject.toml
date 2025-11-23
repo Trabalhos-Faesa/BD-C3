@@ -16,6 +16,8 @@ dependencies = [
     "SQLAlchemy ~= 2.0",
     "psycopg[binary] ~= 3.2",
 
+    "pymongo ~= 4.15",
+
     # "redis[hiredis] ~= 6.4",
 
     "python-decouple ~= 3.8",
