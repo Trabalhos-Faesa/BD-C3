@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
 from abstract import SQLResult, SQLResultDict, SQLResultStatus
-from utils.db import exec_query
+from repositories.db import exec_query
 
 
 router = APIRouter(prefix='/carrinho', tags=['carrinho'])

@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 
 from abstract import SQLResult
-from utils.db import exec_script
+from repositories.db import exec_script
 
 
 router = APIRouter(prefix='/-', tags=['management'])

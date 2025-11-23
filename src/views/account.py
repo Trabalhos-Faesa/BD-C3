@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from abstract import SQLResultStatus
 from models.account import LoginPayload, LoginSuccess
-from utils.db import aexec_query
+from repositories.db import aexec_query
 
 
 router = APIRouter(prefix='/account', tags=['account'])

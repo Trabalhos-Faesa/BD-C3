@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from abstract import SQLResult, SQLResultDict
 from models.produto import Produto
-from utils.db import exec_query
+from repositories.db import exec_query
 
 
 router = APIRouter(prefix='/produto', tags=['produto'])

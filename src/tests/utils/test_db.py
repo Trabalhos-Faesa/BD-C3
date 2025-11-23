@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncEngine,
 )
 
-from utils.db import DBEngines
+from repositories.db import DBEngines
 
 
 @pytest.fixture
