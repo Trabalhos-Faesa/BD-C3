@@ -13,9 +13,7 @@ MONGO_CONNECTION_STRING = config('MONGO_CONNECTION_STRING')
 APP_DB_NAME = 'app'
 
 
-class MongoClients(metaclass=Singleton):
-    """Try to avoid event-loop errors on VSCode debugpy"""
-
+class Mongo(metaclass=Singleton):
     def __init__(self) -> None:
         self._client: MongoClient | None = None
         self._aclient: AsyncMongoClient | None = None
@@ -89,12 +87,12 @@ class MongoClients(metaclass=Singleton):
 
 if __name__ == '__main__':
     async def run():
-        client = MongoClients.get_client()
+        client = Mongo().client
         res = client.admin.command('ping')
         print(f'Ping (sync): {res}')
         client.close()
 
-        aclient = MongoClients.get_aclient()
+        aclient = Mongo().aclient
         res = await aclient.admin.command('ping')
         print(f'Ping (async): {res}')
         await aclient.close()
