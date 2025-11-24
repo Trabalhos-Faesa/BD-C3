@@ -2,6 +2,7 @@ import asyncio
 
 from decouple import config
 from pymongo import AsyncMongoClient, MongoClient
+from pymongo.asynchronous.collection import AsyncCollection
 from pymongo.asynchronous.database import AsyncDatabase
 from pymongo.database import Database
 
@@ -35,17 +36,13 @@ class Mongo(metaclass=Singleton):
     @property
     def app_db(self) -> Database:
         if self._app_db is None:
-            self._app_db: MongoClient = self.get_app_db(
-                self.client
-            )
+            self._app_db: MongoClient = self.client[APP_DB_NAME]
         return self._app_db
 
     @property
     def app_adb(self) -> AsyncDatabase:
         if self._app_adb is None:
-            self._app_adb: MongoClient = self.get_app_adb(
-                self.aclient
-            )
+            self._app_adb: MongoClient = self.aclient[APP_DB_NAME]
         return self._app_adb
 
     @staticmethod
@@ -73,16 +70,6 @@ class Mongo(metaclass=Singleton):
             **kwargs,
         )
         return client
-
-    @staticmethod
-    def get_app_db(mongo_client: MongoClient) -> Database:
-        db = mongo_client[APP_DB_NAME]
-        return db
-
-    @staticmethod
-    def get_app_adb(mongo_aclient: AsyncMongoClient) -> AsyncDatabase:
-        db = mongo_aclient[APP_DB_NAME]
-        return db
 
 
 if __name__ == '__main__':
