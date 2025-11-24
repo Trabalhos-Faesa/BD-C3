@@ -32,6 +32,7 @@ class SQLResultDict(SQLResultDictBase, total=False):
     msg: Optional[str]
 
 
+# TODO: use SQLResult[T](BaseModel) syntax and rm TypeVar declaration
 class SQLResult(BaseModel, Generic[T]):
     # __annotations__ = typing.get_type_hints(SQLResultDict)
     rowcount: int
