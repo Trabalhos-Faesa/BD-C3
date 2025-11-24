@@ -1,3 +1,5 @@
+# TODO: better return types
+
 from bson import ObjectId
 from fastapi import HTTPException
 from pymongo import ReturnDocument
@@ -24,10 +26,12 @@ class ClienteService:
         return [c async for c in self.acoll.find({})]
 
     async def read_one(self, _id: str) -> Cliente | None:
-        # FIXME: where does not exists
         return await self.acoll.find_one({"_id": ObjectId(_id)})
 
     async def update(self, _id: str, cliente: Cliente) -> Cliente:
+        if (await self.read_one(_id)) is None:
+            raise HTTPException(404, f"_id '{_id}' does not exists")
+
         return await self.acoll.find_one_and_update(
             {'_id': ObjectId(_id)},
             {
@@ -41,4 +45,5 @@ class ClienteService:
     async def delete(self, _id: str) -> Cliente:
         if (await self.read_one(_id)) is None:
             raise HTTPException(404, f"_id '{_id}' does not exists")
+
         return await self.acoll.find_one_and_delete({'_id': ObjectId(_id)})
