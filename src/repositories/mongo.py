@@ -71,6 +71,12 @@ class Mongo(metaclass=Singleton):
         )
         return client
 
+    def get_coll(self, collection_name: str) -> AsyncCollection:
+        return self.app_db[collection_name]
+
+    def get_acoll(self, collection_name: str) -> AsyncCollection:
+        return self.app_adb[collection_name]
+
 
 if __name__ == '__main__':
     async def run():
