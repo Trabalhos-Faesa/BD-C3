@@ -1,3 +1,5 @@
+"""The presentation layer"""
+
 from . import (
     account,
 	cliente,
