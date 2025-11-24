@@ -1,9 +1,11 @@
 import logging
-from pymongo.asynchronous.database import AsyncDatabase
+
+from repositories.mongo import Mongo
 
 
 logger = logging.getLogger(__name__)
 
+app_adb = Mongo().app_adb
 COLLECTION_NAMES = [
     'cliente',
     'produto',
@@ -14,17 +16,19 @@ COLLECTION_NAMES = [
 ]
 
 
-async def rm_existent_collections(app_adb: AsyncDatabase) -> None:
+async def rm_existent_collections() -> bool:
     collection_names = await app_adb.list_collection_names()
     if len(collection_names) == 0:
         logger.info(f'Nenhuma collection existente no banco "{app_adb}"')
     else:
         for collection in collection_names:
             logger.warning(f'Deletando todos os docs na collection: "{collection}"')
-            app_adb[collection].delete_many({})
+            await app_adb.drop_collection(collection)
+    return len(await app_adb.list_collection_names()) == 0
 
 
-async def create_collections(app_adb: AsyncDatabase) -> None:
+async def create_collections() -> bool:
     for collection in COLLECTION_NAMES:
         logger.info(f'Criando collection "{collection}"')
-        app_adb[collection]
+        await app_adb.create_collection(collection)
+    return set(await app_adb.list_collection_names()) == set(COLLECTION_NAMES)
