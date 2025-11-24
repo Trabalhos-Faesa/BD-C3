@@ -1,3 +1,16 @@
+from typing import Any
+
+from bson.objectid import ObjectId
+
+
+def validate_object_id_str(v: ObjectId | Any) -> str:
+    if isinstance(v, ObjectId):
+        return str(v)
+    if ObjectId.is_valid(v):
+        return str(ObjectId(v))
+    raise ValueError(f"Invalid ObjectId: '{v}'")
+
+
 # def valid_digits(digits: str) -> str:
 #     if not digits.isdecimal():
 #         raise ValueError(f'"{digits}" deve ser composto apenas de dígitos')
