@@ -1,12 +1,34 @@
 from typing import Annotated, Optional
 
-from pydantic import AfterValidator, BaseModel, EmailStr, StringConstraints
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    EmailStr,
+    Field,
+    PlainSerializer,
+    StringConstraints,
+    WithJsonSchema,
+)
 
-from utils.validators import valid_cpf, valid_senha
+from utils.validators import (
+    valid_cpf,
+    valid_senha,
+    validate_object_id_str,
+)
+
+
+PyObjectId = Annotated[
+    str,
+    BeforeValidator(validate_object_id_str),
+    PlainSerializer(str, return_type=str),
+    WithJsonSchema({'type': 'string'}, mode='serialization'),
+]
 
 
 class Cliente(BaseModel):
-    id_cliente: Optional[int] = None
+    id: Optional[PyObjectId] = Field(default=None, alias='_id')
     email: EmailStr
     senha: Annotated[str, AfterValidator(valid_senha)]
     nome: str
@@ -21,3 +43,13 @@ class Cliente(BaseModel):
     rua: Optional[str] = None
     numero: Optional[str] = None
     complemento: Optional[str] = None
+
+    model_config = ConfigDict(
+        {
+            'populate_by_name': True,
+            'arbitrary_types_allowed': True,
+            # 'json_encoders': {
+            #     ObjectId: str,
+            # }
+        }
+    )
