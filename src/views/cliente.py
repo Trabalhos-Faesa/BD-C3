@@ -1,58 +1,61 @@
-from fastapi import APIRouter
+# FIXME: router response_model e return types
 
-from abstract import SQLResult, SQLResultDict
+from bson import ObjectId
+from fastapi import APIRouter, HTTPException
+from pymongo import ReturnDocument
+
 from models.cliente import Cliente
-from repositories.sql_db import aexec_query
 from repositories.mongo import Mongo
 
 
 router = APIRouter(prefix='/cliente', tags=['cliente'])
 
-COLLECTION_NAME = 'cliente'
+coll = Mongo().get_acoll('cliente')
 
 
-# FIXME: response_model
 @router.post('/')
-async def create(cliente: Cliente):
-    app_adb = Mongo().app_adb
-    collection = app_adb[COLLECTION_NAME]
-    res = collection.insert_one(
+async def create(cliente: Cliente) -> dict:
+    res = await coll.insert_one(
         cliente.model_dump(),
+    )
+    return {
+        'inserted_id': str(res.inserted_id),
+        'acknowledged': res.acknowledged,
+    }
+
+
+@router.get('/')
+async def read_all() -> list[Cliente]:
+    res = [c async for c in coll.find({})]
+    return res
+
+
+@router.get('/{_id}')
+async def read_one(_id: str) -> Cliente:
+    res = await coll.find_one({"_id": ObjectId(_id)})
+    return res
+
+
+# TODO: Partial update with .patch
+@router.put('/{_id}')
+async def update(_id: str, cliente: Cliente) -> Cliente:
+    res = await coll.find_one_and_update(
+        {'_id': ObjectId(_id)},
+        {
+            '$set': cliente.model_dump() | {
+                '_id': ObjectId(_id),
+            },
+        },
+        return_document=ReturnDocument.AFTER,
     )
     return res
 
 
-@router.get('/', response_model=SQLResult[Cliente])
-async def read_all() -> SQLResultDict:
-    return await aexec_query('cliente/read_all.sql')
-
-
-@router.get('/{id_cliente}', response_model=SQLResult[Cliente])
-async def read_one(id_cliente: int) -> SQLResultDict:
-    return await aexec_query(
-        'cliente/read_one.sql',
-        {
-            'id_cliente': id_cliente,
-        },
-    )
-
-
-# TODO: Partial update with .patch
-@router.put('/{id_cliente}', response_model=SQLResult[Cliente])
-async def update(id_cliente: int, cliente: Cliente) -> SQLResultDict:
-    return await aexec_query(
-        'cliente/update.sql',
-        cliente.model_dump() | {
-            'id_cliente': id_cliente,
-        },
-    )
-
-
-@router.delete('/{id_cliente}', response_model=SQLResult[Cliente])
-async def delete(id_cliente: int) -> SQLResultDict:
-    return await aexec_query(
-        'cliente/delete.sql',
-        {
-            'id_cliente': id_cliente,
-        }
-    )
+@router.delete('/{_id}')
+async def delete(_id: str) -> Cliente:
+    # TODO: DRY
+    exists: bool = (await coll.find_one({"_id": ObjectId(_id)})) is not None
+    if not exists:
+        raise HTTPException(404, f"_id '{_id}' does not exists")
+    res = await coll.find_one_and_delete({'_id': ObjectId(_id)})
+    return res
