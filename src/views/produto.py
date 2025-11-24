@@ -1,52 +1,36 @@
 from fastapi import APIRouter
 
-from abstract import SQLResult, SQLResultDict
+from app_layer.produto import ProdutoService
 from models.produto import Produto
-from repositories.sql_db import exec_query
 
 
 router = APIRouter(prefix='/produto', tags=['produto'])
+service = ProdutoService()
 
 
-@router.post('/', response_model=SQLResult[Produto])
-async def create(produto: Produto) -> SQLResultDict:
-    return exec_query(
-        'produto/create.sql',
-        produto.model_dump(),
-    )
+@router.post('/')
+async def create(produto: Produto) -> dict:
+    return await service.create(produto)
 
 
-@router.get('/', response_model=SQLResult[Produto])
-async def read_all() -> SQLResultDict:
-    return exec_query('produto/read_all.sql')
+@router.get('/')
+async def read_all() -> list[Produto]:
+    return await service.read_all()
 
 
-@router.get('/{id_produto}', response_model=SQLResult[Produto])
-async def read_one(id_produto: int) -> SQLResultDict:
-    return exec_query(
-        'produto/read_one.sql',
-        {
-            'id_produto': id_produto,
-        },
-    )
+@router.get('/{_id}')
+async def read_one(_id: str) -> Produto | None:
+    return await service.read_one(_id)
+
+
+@router.put('/{_id}')
+async def update(_id: str, produto: Produto) -> Produto:
+    return await service.update(_id, produto)
 
 
 # TODO: Partial update with .patch
-@router.put('/{id_produto}', response_model=SQLResult[Produto])
-async def update(id_produto: int, produto: Produto) -> SQLResultDict:
-    return exec_query(
-        'produto/update.sql',
-        produto.model_dump() | {
-            'id_produto': id_produto,
-        },
-    )
 
 
-@router.delete('/{id_produto}', response_model=SQLResult[Produto])
-async def delete(id_produto: int) -> SQLResultDict:
-    return exec_query(
-        'produto/delete.sql',
-        {
-            'id_produto': id_produto,
-        }
-    )
+@router.delete('/{_id}')
+async def delete(_id: str) -> Produto:
+    return await service.delete(_id)
