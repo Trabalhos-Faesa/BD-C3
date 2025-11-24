@@ -1,4 +1,4 @@
-# TODO: router response_model and better return types
+# TODO: response_model
 
 from fastapi import APIRouter
 
@@ -11,25 +11,25 @@ service = ClienteService()
 
 
 @router.post('/')
-async def create(cliente: Cliente) -> dict:
+async def create(cliente: Cliente):
     return await service.create(cliente)
 
 
 @router.get('/')
-async def read_all() -> list[Cliente]:
+async def read_all():
     return await service.read_all()
 
 
 @router.get('/{_id}')
-async def read_one(_id: str) -> Cliente:
+async def read_one(_id: str):
     return await service.read_one(_id)
 
 @router.put('/{_id}')
-async def update(_id: str, cliente: Cliente) -> Cliente:
+async def update(_id: str, cliente: Cliente):
     return await service.update(_id, cliente)
 
 # TODO: Partial update with .patch
 
 @router.delete('/{_id}')
-async def delete(_id: str) -> Cliente:
+async def delete(_id: str):
     return await service.delete(_id)
