@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app_layer.produto import ProdutoService
+from services.produto import ProdutoService
 from models.produto import Produto
 
 

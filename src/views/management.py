@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from abstract import SQLResult
 from repositories.sql_db import exec_script
-from app_layer import init_mongo
+from services import init_mongo
 
 
 router = APIRouter(prefix='/-', tags=['management'])
